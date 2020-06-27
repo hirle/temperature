@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "author": "Hirle",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "@types/socket.io": "^2.1.8",
+    "jest": "^26.0.1",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "bonjour": "^3.5.0",
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  }
+}
