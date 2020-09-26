@@ -1,16 +1,20 @@
 {
   "name": "temperature",
   "version": "1.0.0",
-  "description": "Temperature pour sonarsource",
-  "main": "index.js",
+  "description": "Temperature",
+  "private": true,
+  "workspaces": [
+    "api",
+    "model",
+    "ui"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "lerna exec -- yarn build",
+    "start": "cd api && yarn start"
   },
-  "author": "eric.hirlemann@sonarsource.com",
+  "author": "Hirle",
   "license": "UNLICENSED",
-  "dependencies": {
-    "body-parser": "^1.18.0",
-    "express": "^4.15.4",
-    "pg-promise": "^6.5.2"
+  "devDependencies": {
+    "lerna": "^3.22.1"
   }
 }

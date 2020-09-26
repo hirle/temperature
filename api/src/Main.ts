@@ -1,5 +1,9 @@
 import Web from './Web';
-
+import DbConnector from './DbConnector';
+import Controller from './Controller';
+import OneWireConnector from './OneWireConnector';
+import Config from './Config';
+import fs from 'fs'
 
 export function main(argv: string[]): number {
 
@@ -7,7 +11,7 @@ export function main(argv: string[]): number {
 
     const dbConnector = new DbConnector(config);
     const webConnector = new Web(config);
-    const oneWireConnector = new OneWireConnector(config);
+    const oneWireConnector = new OneWireConnector(config.oneWire.path);
 
     const controller = new Controller(
         config,

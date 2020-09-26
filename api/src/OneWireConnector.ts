@@ -4,7 +4,7 @@ export default class OneWireConnector {
 
   private path: string;
 
-  contructor(path: string) {
+  constructor(path: string) {
     this.path = path;
   }
 

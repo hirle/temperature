@@ -1,0 +1,10 @@
+{
+  "defaultIntervalMs" : 60000,
+  "port" : 3300,
+  "postgresql" :{
+    "connstring": "postgres://postgres:postgres@localhost:5432/postgres"
+  },
+  "oneWire" :{
+    "path" : "/sys/bus/w1/devices/28-0414606b95ff/w1_slave"
+  }
+}

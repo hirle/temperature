@@ -2,7 +2,9 @@ import Web from './Web';
 import Config from './Config';
 import OneWireConnector from './OneWireConnector';
 import DbConnector from './DbConnector';
-import Temperature from '@model/Temperature';
+import {Location} from '@temperature/model';
+import {Status} from '@temperature/model';
+import {Temperature} from '@temperature/model';
 
 export default class Controller {
 
@@ -10,8 +12,10 @@ export default class Controller {
   config: Config;
   dbConnector: DbConnector;
   oneWireConnector: OneWireConnector;
-  location?: string;
+  location?: Location;
   cycle?: NodeJS.Timeout;
+
+  static readonly defaultNbOfPoints: 50;
 
   constructor(config: Config, webConnector: Web, dbConnector: DbConnector, oneWireConnector: OneWireConnector) {
     this.config = config;
@@ -27,11 +31,21 @@ export default class Controller {
     this.startSimpleCycle();
   }
 
-  getLatestTemperature(): Promise<Temperature> {
+  getCurrentTemperature(): Promise<Temperature> {
     throw new Error('not implemented yet');
   }
 
-  getLastTemperatures(nbOfPoints: number): Promise<Temperature[]> {
+  getStatus(): Promise<Status.default> {
+    const returned = new Status.default(!!this.cycle, this.location);
+    return Promise.resolve(returned);
+  }
+
+  getLastTemperatures(nbOfPoints?: number): Promise<Temperature[]> {
+
+    const effectiveNbOfPoints = !nbOfPoints
+      ? Controller.defaultNbOfPoints
+      : nbOfPoints;
+
     throw new Error('not implemented yet');;
   }
 
@@ -43,9 +57,9 @@ export default class Controller {
     this.location = undefined;
   }
 
-  startRecordingCycle(location: string) {
+  startRecordingCycle(location: Location) {
     this.stopAnyCycle();
-    this.location = location;
+    this.location = new Location(location);
     this.cycle = setInterval(this.runRecordingCycle, this.config.defaultInterval);
   }
 
@@ -56,12 +70,10 @@ export default class Controller {
 
   runSimpleCycle() {
     this.oneWireConnector.readOneTemperature()
-    .then( temperature  =>{
-      this.webConnector();
-    })
-    .catch(err => {
-      console.log(err);
-    })
+      .then(temperature => this.webConnector.emitCurrentTemperature(temperature))
+      .catch(err => {
+        console.log(err);
+      })
 
   }
 

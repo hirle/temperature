@@ -1,6 +1,6 @@
 {
-  "name": "ui",
-  "version": "0.1.0",
+  "name": "@temperature/ui",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -13,7 +13,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "@temperature/model": "1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

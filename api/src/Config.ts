@@ -11,5 +11,5 @@ export default interface Config {
     defaultInterval: number
     port: number,
     postgresql: DbDesription;
-    gpio: OneWireDescription;
+    oneWire: OneWireDescription;
 }
