@@ -4,9 +4,9 @@ import { Status } from '../src/index';
 
 describe('Model', () => {
   it('should export 3 types', () => {
-    console.log
-    expect(.location).toBeInstanceOf(Function);
-    expect(Status).toBeInstanceOf(Function);
-    expect(Temperature).toBeInstanceOf(Function);
+    console.log(Temperature)
+    expect(Location.default).toBeInstanceOf(Function);
+    expect(Status.default).toBeInstanceOf(Function);
+    expect(Temperature.default).toBeInstanceOf(Function);
   });
 });

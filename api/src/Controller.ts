@@ -32,12 +32,12 @@ export default class Controller {
   }
 
   getCurrentTemperature(): Promise<Temperature> {
-    throw new Error('not implemented yet');
+    return this.oneWireConnector.readOneTemperature()
+      .then( value => new Temperature(value, new Date()));
   }
 
-  getStatus(): Promise<Status.default> {
-    const returned = new Status.default(!!this.cycle, this.location);
-    return Promise.resolve(returned);
+  getStatus(): Status {
+    return  this.cycle ? new Status(true, location) : new Status(false, undefined);
   }
 
   getLastTemperatures(nbOfPoints?: number): Promise<Temperature[]> {
@@ -59,18 +59,20 @@ export default class Controller {
 
   startRecordingCycle(location: Location) {
     this.stopAnyCycle();
-    this.location = new Location(location);
-    this.cycle = setInterval(this.runRecordingCycle, this.config.defaultInterval);
+    this.location = location;
+    this.cycle = setInterval(this.runRecordingCycle.bind(this), this.config.defaultIntervalMs);
   }
 
   startSimpleCycle() {
     this.stopAnyCycle();
-    this.cycle = setInterval(this.runSimpleCycle, this.config.defaultInterval);
+    this.cycle = setInterval(this.runSimpleCycle.bind(this), this.config.defaultIntervalMs);
   }
 
   runSimpleCycle() {
     this.oneWireConnector.readOneTemperature()
-      .then(temperature => this.webConnector.emitCurrentTemperature(temperature))
+      .then(temperature => {
+        this.webConnector.emitCurrentTemperature(new Temperature(temperature, new Date()));
+      })
       .catch(err => {
         console.log(err);
       })
@@ -81,11 +83,14 @@ export default class Controller {
     this.oneWireConnector.readOneTemperature()
       .then(temperature => {
         if (!isNaN(temperature)) {
-          const theTemperature = Temperature.create(temperature, location);
-          return this.dbConnector.recordTemperature(theTemperature)
+          if( this.location ) {
+            return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), this.location);
+          } else {
+            return Promise.resolve();
+          }
         } else {
           console.log('bad checksum');
-          return;
+          return Promise.resolve();
         }
       })
       .catch(err => {

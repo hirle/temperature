@@ -8,7 +8,7 @@ interface DbDesription {
 }
 
 export default interface Config {
-    defaultInterval: number
+    defaultIntervalMs: number
     port: number,
     postgresql: DbDesription;
     oneWire: OneWireDescription;

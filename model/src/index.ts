@@ -1,3 +1,5 @@
-export * as Temperature from "./Temperature";
-export * as Location from "./Location";
-export * as Status from "./Temperature";
+
+
+export { default as Temperature } from './Temperature';
+export { default as Location } from './Location';
+export { default as Status } from './Status';

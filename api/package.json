@@ -10,17 +10,18 @@
   "author": "Hirle",
   "license": "MIT",
   "devDependencies": {
-    "@types/express": "^4.17.6",
-    "@types/socket.io": "^2.1.8",
     "@types/bonjour": "^3.5.6",
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.11.2",
+    "@types/socket.io": "^2.1.8",
     "jest": "^26.0.1",
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "bonjour": "^3.5.0",
-    "express": "^4.17.1",
-    "express-json": "^1.0.0",
+    "@homebridge/ciao": "^1.0.12",
     "@temperature/model": "1.0.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
     "socket.io": "^2.3.0"
   }
 }

@@ -1,11 +1,13 @@
 import express from 'express';
-import expressJson from 'express-json';
+import bodyParser from 'body-parser';
 import { Server } from 'http';
 import socketIO from 'socket.io';
 import Controller from './Controller';
 import Config from './Config';
-import bonjour from 'bonjour';
-import {Temperature} from 'model';
+import ciao from '@homebridge/ciao';
+import {Temperature} from '@temperature/model';
+import {Status} from '@temperature/model';
+import {Location} from '@temperature/model';
 
 export default class Web {
 
@@ -24,16 +26,16 @@ export default class Web {
   }
 
   startOn(controller: Controller) {
-    this.controller = controller
-    this.app.use('/static', express.static('static'))
-    this.app.use(expressJson())
+    this.controller = controller;
+    this.app.use('/static', express.static('static'));
+    this.app.use(bodyParser.json());
 
-    this.app.all('*', (req, res, next) => {
+    this.app.all('*', (req, _, next) => {
       console.log(req.method + ' ' + req.url)
       next()
     })
 
-    this.app.get('/', (req, res) => {
+    this.app.get('/', (_, res) => {
       res.redirect('/static/index.html');
     })
 
@@ -42,7 +44,7 @@ export default class Web {
     this.setupBonjourAdvertisment();
 
     this.server.listen(this.config.port, () => {
-      console.log('Listening on %s', this.server.address().toString())
+      console.log(`Listening on ${this.server.address()}`)
     });
 
     this.setSocketIO();
@@ -50,14 +52,17 @@ export default class Web {
 
   setAPIRoutes() {
 
-    this.app.get('/api/temperature/latest', (req, res) => {
-      res.send(this.controller!.getCurrentTemperature());
+    this.app.get('/api/temperature/latest', (_, res, next) => {
+      this.controller!.getCurrentTemperature()
+      .then( temperature => {
+        res.send(temperature);
+      })
+      .catch(next);
     });
 
     this.app.get('/api/temperatures', (req, res, next) => {
-
-      this.controller!
-        .getLastTemperatures(parseInt(req.query.count))
+      const queryCount = req.query.count;
+      this.controller!.getLastTemperatures(queryCount ? parseInt(queryCount.toString()) : undefined )
         .then(temperatures => {
           // HTTP_STATUS_NO_CONTENT
           res.sendStatus(204);
@@ -70,12 +75,15 @@ export default class Web {
       // TODO decode 
       const location = new Location('TODO');
 
-      this.controller!.startRecordingCycle(location)
-        .then( () => {
+      try {
+        this.controller!.startRecordingCycle(location)
+        
           // HTTP_STATUS_NO_CONTENT
           res.sendStatus(204);
-        })
-        .catch(next);
+        }
+        catch(err) {
+          next(err);
+        }
     });
   }
 
@@ -92,12 +100,24 @@ export default class Web {
   }
 
   setupBonjourAdvertisment() { 
-    bonjour.publish({ name: 'Temperature', type: 'http', port: this.config.port });
+    // create a service defining a web server running on port 3000
+    const service = ciao.getResponder().createService({
+        name: 'Temperature',
+        type: 'http',
+        port: this.config.port
+    });
+
+    service.advertise().then(() => {
+      console.log("Service is published :)");
+    });
+    
+
   }
 
   setSocketIO() {
     this.io.on('connection', socket => {
-      socket.send(this.controller.getStatus());
+
+      if( this.controller ){      socket.send(this.controller.getStatus());}
     });
   }
 }

@@ -9,7 +9,9 @@
     "ui"
   ],
   "scripts": {
-    "build": "lerna exec -- yarn build",
+    "build": "lerna run build:children && lerna run prepare-files",
+    "prepare-files":"mkdir -p dist/static && cp api/dist/*.js dist && cp -R ui/build/* dist/static",
+    "build:children": "lerna exec yarn build",
     "start": "cd api && yarn start"
   },
   "author": "Hirle",

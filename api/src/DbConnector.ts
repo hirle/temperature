@@ -1,4 +1,6 @@
-import {Temperature} from "model";
+import {Temperature} from '@temperature/model';
+import {Location} from '@temperature/model';
+
 import Config from "./Config";
 
 export default class DbConnector {
@@ -9,7 +11,7 @@ export default class DbConnector {
         this.config = config;
     }
 
-    public recordTemperature(temperature: Temperature): Promise<void> {
+    public recordTemperature(temperature: Temperature, location: Location): Promise<void> {
         throw new Error('not implemented yet');
     }
 

@@ -1,3 +1,5 @@
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 # Temperature
 
 When having the chance to live in a large house, like me, setting up correctly the central heating can be not that trivial: you need understand how your house reacts when outside tempature goes up or down.
