@@ -9,7 +9,7 @@ export function main(argv: string[]): number {
 
     const config = processArgv(argv);
 
-    const dbConnector = new DbConnector(config);
+    const dbConnector = new DbConnector(config.postgresql);
     const webConnector = new Web(config);
     const oneWireConnector = new OneWireConnector(config.oneWire.path);
 

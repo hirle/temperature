@@ -41,8 +41,6 @@ export default class Web {
 
     this.setAPIRoutes();
 
-    this.setupBonjourAdvertisment();
-
     this.server.listen(this.config.port, () => {
       console.log(`Listening on ${this.server.address()}`)
     });
@@ -60,20 +58,21 @@ export default class Web {
       .catch(next);
     });
 
-    this.app.get('/api/temperatures', (req, res, next) => {
+    this.app.get('/api/temperatures/:location', (req, res, next) => {
+
       const queryCount = req.query.count;
-      this.controller!.getLastTemperatures(queryCount ? parseInt(queryCount.toString()) : undefined )
+      const location = new Location(req.params.location);
+
+      this.controller!.getLastTemperatures(location, queryCount ? parseInt(queryCount.toString()) : undefined )
         .then(temperatures => {
-          // HTTP_STATUS_NO_CONTENT
-          res.sendStatus(204);
+          res.status(200).send(temperatures);
         })
         .catch(next);
     });
 
-    this.app.post('/api/',  (req, res, next) => {
+    this.app.post('/api/recording/start/:location',  (req, res, next) => {
 
-      // TODO decode 
-      const location = new Location('TODO');
+      const location = new Location(req.params.location);
 
       try {
         this.controller!.startRecordingCycle(location)
@@ -84,6 +83,20 @@ export default class Web {
         catch(err) {
           next(err);
         }
+    });
+
+    this.app.post('/api/recording/stop', (_, res, next) => {
+      try {
+
+        this.controller!.stopRecodingCycle();
+
+        // HTTP_STATUS_NO_CONTENT
+        res.sendStatus(204);
+      }
+      catch(err) {
+        next(err);
+      }
+
     });
   }
 

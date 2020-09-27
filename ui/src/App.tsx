@@ -18,6 +18,8 @@ const StyledApp = styled.div`
 
 const StyledHeader = styled.header`
   text-align: center;
+  font-size: 36px;
+
 `;
 
 function App() {
@@ -26,9 +28,9 @@ function App() {
       <StyledHeader className="App-header">
         Temperature
       </StyledHeader>
-      <body>
+      <section>
         <CurrentTemperature/>
-      </body>
+      </section>
     </StyledApp>
   );
 }

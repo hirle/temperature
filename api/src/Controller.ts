@@ -13,9 +13,9 @@ export default class Controller {
   dbConnector: DbConnector;
   oneWireConnector: OneWireConnector;
   location?: Location;
-  cycle?: NodeJS.Timeout;
+  cycle?: number;
 
-  static readonly defaultNbOfPoints: 50;
+  static readonly defaultNbOfPoints = 6*60;
 
   constructor(config: Config, webConnector: Web, dbConnector: DbConnector, oneWireConnector: OneWireConnector) {
     this.config = config;
@@ -28,7 +28,22 @@ export default class Controller {
     console.log('web starting')
     this.webConnector.startOn(this);
     console.log('web started on');
-    this.startSimpleCycle();
+
+    console.log('db starting')
+    this.dbConnector.connect()
+      .then(()=> {
+        console.log('db started on')
+
+        this.startSimpleCycle();
+
+        this.webConnector.setupBonjourAdvertisment();
+      })
+      .catch(err  => {
+        this.dbConnector.disconnect();
+        throw err;
+      })
+
+
   }
 
   getCurrentTemperature(): Promise<Temperature> {
@@ -37,16 +52,14 @@ export default class Controller {
   }
 
   getStatus(): Status {
-    return  this.cycle ? new Status(true, location) : new Status(false, undefined);
+    return  this.cycle ? new Status(true, this.location) : new Status(false, undefined);
   }
 
-  getLastTemperatures(nbOfPoints?: number): Promise<Temperature[]> {
-
+  getLastTemperatures(location: Location, nbOfPoints?: number): Promise<Temperature[]> {
     const effectiveNbOfPoints = !nbOfPoints
       ? Controller.defaultNbOfPoints
       : nbOfPoints;
-
-    throw new Error('not implemented yet');;
+    return this.dbConnector.getLatestTemperatures(location, effectiveNbOfPoints);
   }
 
   stopAnyCycle() {
@@ -63,8 +76,15 @@ export default class Controller {
     this.cycle = setInterval(this.runRecordingCycle.bind(this), this.config.defaultIntervalMs);
   }
 
+  stopRecodingCycle(){ 
+    if( this.location ) {
+      this.startSimpleCycle()
+    }
+  }
+
   startSimpleCycle() {
     this.stopAnyCycle();
+    this.location = undefined;
     this.cycle = setInterval(this.runSimpleCycle.bind(this), this.config.defaultIntervalMs);
   }
 
@@ -83,8 +103,16 @@ export default class Controller {
     this.oneWireConnector.readOneTemperature()
       .then(temperature => {
         if (!isNaN(temperature)) {
+
+          this.webConnector.emitCurrentTemperature(new Temperature(temperature, new Date()));
+          
           if( this.location ) {
-            return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), this.location);
+            return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), this.location)
+              .then( () => this.dbConnector.getLatestTemperatures(this.location!, Controller.defaultNbOfPoints ) )
+              .then( temperatures => {
+                this.webConnector.emitLastTemperatures(temperatures);
+                return Promise.resolve();
+              });
           } else {
             return Promise.resolve();
           }

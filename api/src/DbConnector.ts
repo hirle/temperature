@@ -1,21 +1,64 @@
 import {Temperature} from '@temperature/model';
 import {Location} from '@temperature/model';
+import { Client } from 'pg';
 
-import Config from "./Config";
+import { DbDescription } from "./Config";
 
 export default class DbConnector {
 
-    config: Config;
+    private client: Client;
+    private static readonly tableName = 'temperature';
 
-    constructor(config: Config){
-        this.config = config;
+    constructor(config: DbDescription){
+        this.client = new Client(config);
+    }
+
+    public connect(): Promise<void> {
+        return this.client.connect()
+            .then(() => this.doesTableExist( DbConnector.tableName ))
+            .then( tableExists => tableExists
+                    ? Promise.resolve()
+                    : this.prepareTable( DbConnector.tableName ) 
+            );
+    }
+
+    public disconnect(): Promise<void> {
+        return this.client.end();
+    }
+
+    private doesTableExist( tableName :string ): Promise<boolean> {
+        return this.client.query(`SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '${tableName}');`)
+            .then((result) => {
+                if( result.rowCount !== 1 || !Array.isArray(result.rows) || result.rows.length != 1 ) {
+                    throw new Error('unexpected row result');
+                }
+
+                return !!result.rows[0].exists
+            });
+    }
+
+    private prepareTable( tableName :string ): Promise<void> {
+        return this.client.query(`CREATE TABLE IF NOT EXISTS ${tableName} ( id SERIAL PRIMARY, location varchar(64) NOT NULL, value VARCHAR(255) NOT NULL, at TIMESTAMP NOT NULL);`)
+            .then(() => this.client.query(`CREATE INDEX iLocation ON ${tableName} (location)`))
+            .then(() => this.client.query(`CREATE INDEX iAt ON ${tableName} (at)`))
+            .then(() => Promise.resolve());
     }
 
     public recordTemperature(temperature: Temperature, location: Location): Promise<void> {
-        throw new Error('not implemented yet');
+       return this.client.query(
+        `INSERT INTO ${DbConnector.tableName} (location, value, at) VALUES ($1, $2, $3)`,
+        [location.toString(), temperature.value, temperature.timestamp.toISOString()]
+        )
+       .then( result => {
+            if( result.rowCount !== 1) {
+                throw new Error('unexpected row count');
+            }
+
+            return Promise.resolve();
+        });
     }
 
-    public getLatestTemperatures(count: number): Promise<Temperature[]>{
+    public getLatestTemperatures(location: Location, count: number): Promise<Temperature[]>{
         throw new Error('not implemented yet');
     }
 }
