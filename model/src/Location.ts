@@ -5,7 +5,7 @@ export default class Location {
         this.location = location;
     }
 
-    public toString() {
+    public serialize(): string {
         return this.location;
     }
 
