@@ -108,7 +108,7 @@ export default class Controller {
           
           if( this.location ) {
             return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), this.location)
-              .then( () => this.dbConnector.getLatestTemperatures(this.location, Controller.defaultNbOfPoints ) )
+              .then( () => this.dbConnector.getLatestTemperatures(this.location!, Controller.defaultNbOfPoints ) )
               .then( temperatures => {
                 this.webConnector.emitLastTemperatures(temperatures);
                 return Promise.resolve();
