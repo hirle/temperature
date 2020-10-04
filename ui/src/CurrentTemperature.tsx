@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import io from 'socket.io-client';
 import {Temperature} from '@temperature/model';
 import {GetCurrentTemperature} from './api';
+import SocketIo from './SocketIo';
 
 const BigText = styled.span`
   color: white;
@@ -19,49 +19,54 @@ const Error = styled.div`
     color: red;
 `;
 
+interface CurrentTemperatureProps {
+  socketIo: SocketIo
+}
+
+enum Status {
+  Loading,
+  Running,
+  Error
+}
+
 interface CurrentTemperatureState {
-    connected: boolean,
+    status: Status,
     current?: Temperature
 }
 
-export default class CurrentTemperature extends React.Component<{}, CurrentTemperatureState> {
-    
-  private socket?: SocketIOClient.Socket;
+export default class CurrentTemperature
+  extends React.Component<CurrentTemperatureProps, CurrentTemperatureState> {
 
-  constructor(props: any) {
+  constructor(props: CurrentTemperatureProps) {
       super(props);
-      this.state = {connected: false};
+      this.state = {status: Status.Loading};
     }
 
   componentDidMount() {
       GetCurrentTemperature()
         .then( temperature => {        
-          this.setState({connected: true, current: temperature});
+          this.setState({status: Status.Running, current: temperature});
 
           this.setUpSocketIO();
         })
         .catch( err => {
           console.log(err);
-          this.setState({connected: false, current: undefined});
+          this.setState({status: Status.Error, current: undefined});
         });
   }
 
   setUpSocketIO() {
-    this.socket = io('/');
-    this.socket.on('connect', () => { this.setState({connected:true});});
-    this.socket.on('current-temperature', (data: any) => {
-      const current = Temperature.create(data);
-      this.setState({current});
-    });
-    this.socket.on('disconnect', () => {this.setState({connected:false});});  
+    this.props.socketIo.addObserver('current-temperature', this.onCurrentTemperature);
+  }
+  onCurrentTemperature( data:any) {
+    const current = Temperature.create(data);
+    this.setState({current});
   }
 
   render() {
-    return this.state.connected
-      ? <Measure><BigText>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}</Measure>
-      : <Error>(Not connected)</Error>
+    switch(this.state.status)  {
+      case Status.Loading: return <div>Loading...</div>;
+      case Status.Running: return <Measure><BigText>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}</Measure>;
+      default: return <Error>Can't get the temperature</Error>;
   }
-
-
-}
-  
+}  

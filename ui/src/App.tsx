@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components'
 import CurrentTemperature from './CurrentTemperature'
+import SocketIo from './SocketIo';
 
 const StyledApp = styled.div`
   background-color: #282c34;
@@ -22,17 +23,31 @@ const StyledHeader = styled.header`
 
 `;
 
-function App() {
-  return (
+export default class App extends React.Component {
+
+  private socketIo: SocketIo;
+
+  constructor(props: any ) {
+    super(props);
+    this.socketIo = new SocketIo();
+  }
+
+  componentDidMount() {
+    this.socketIo.startOn('/');
+  }
+
+  render() { return (
     <StyledApp>
       <StyledHeader className="App-header">
         Temperature
       </StyledHeader>
       <section>
-        <CurrentTemperature/>
+        <CurrentTemperature socketIo={this.socketIo}/>
+      </section>
+      <section>
+                
       </section>
     </StyledApp>
   );
+ }
 }
-
-export default App;
