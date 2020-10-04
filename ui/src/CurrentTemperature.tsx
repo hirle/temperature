@@ -4,8 +4,8 @@ import {Temperature} from '@temperature/model';
 import {GetCurrentTemperature} from './api';
 import SocketIo from './SocketIo';
 
-const BigText = styled.span`
-  color: white;
+const BigText = styled.span<{ bright: boolean }>`
+  color: ${ props => props.bright ? 'white': 'gray'};
   font-size: 48px;
 `;
 
@@ -30,6 +30,7 @@ enum Status {
 }
 
 interface CurrentTemperatureState {
+    connected: boolean
     status: Status,
     current?: Temperature
 }
@@ -39,13 +40,13 @@ export default class CurrentTemperature
 
   constructor(props: CurrentTemperatureProps) {
       super(props);
-      this.state = {status: Status.Loading};
+      this.state = {status: Status.Loading, connected: false};
     }
 
   componentDidMount() {
       GetCurrentTemperature()
         .then( temperature => {        
-          this.setState({status: Status.Running, current: temperature});
+          this.setState({status: Status.Running, current: temperature, connected:true});
 
           this.setUpSocketIO();
         })
@@ -56,17 +57,28 @@ export default class CurrentTemperature
   }
 
   setUpSocketIO() {
-    this.props.socketIo.addObserver('current-temperature', this.onCurrentTemperature);
+    this.props.socketIo.addObserver('connect', this.onConnect.bind(this));
+    this.props.socketIo.addObserver('current-temperature', this.onCurrentTemperature.bind(this));
+    this.props.socketIo.addObserver('disconnect', this.onDisconnect.bind(this));
   }
   onCurrentTemperature( data:any) {
     const current = Temperature.create(data);
     this.setState({current});
   }
 
+  onConnect() {
+    this.setState({connected: true});
+  }
+
+  onDisconnect() {
+    this.setState({connected: false});
+  }
+
   render() {
     switch(this.state.status)  {
       case Status.Loading: return <div>Loading...</div>;
-      case Status.Running: return <Measure><BigText>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}</Measure>;
+      case Status.Running: return <Measure><BigText bright={this.state.connected}>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}</Measure>;
       default: return <Error>Can't get the temperature</Error>;
+    }
   }
 }  

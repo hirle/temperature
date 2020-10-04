@@ -18,6 +18,8 @@ const StyledApp = styled.div`
 `;
 
 const StyledHeader = styled.header`
+  padding-top: 12px;
+  padding-bottom: 12px;
   text-align: center;
   font-size: 36px;
 
