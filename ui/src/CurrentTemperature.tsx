@@ -53,7 +53,7 @@ export default class CurrentTemperature extends React.Component<{}, CurrentTempe
       const current = Temperature.create(data);
       this.setState({current});
     });
-    this.socket.on('disconnect', () => {this.setState({connected:false});;});  
+    this.socket.on('disconnect', () => {this.setState({connected:false});});  
   }
 
   render() {
