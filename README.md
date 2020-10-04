@@ -41,6 +41,7 @@ Go on (https://github.com/hirle/temperature), download the latest release and ex
 
 ### Prepare the service
 
+`npm install file:./temperature-model.tgz`
 `npm install`
 
 `sudo systemctl enable temperature`
@@ -55,13 +56,17 @@ Go on (https://github.com/hirle/temperature), download the latest release and ex
 
 #### Prepare a config file
 
-This file named `config.json` must look like
+A file named `config.json` must look like
 ```javascript
 {
   "defaultIntervalMs" : 60000,
   "port" : 3300,
   "postgresql" :{
-    "connstring": "postgres://postgres:Ploplop44@localhost:5432/postgres"
+    "user": "postgres",
+    "password": "very.secret",
+    "host": "my.host.org",
+    "port": 5432,
+    "database": "postgres"
   },
   "one-wire" :{
     "path" : "/Users/hirle/Developer/workspace/temperature/example.frame"

@@ -12,7 +12,7 @@
     "prepare-dist": "run-p copy-api-to-dist copy-ui-to-dist pack-model",
     "copy-api-to-dist": "mkdir -p dist && cp api/dist/*.js dist && cp api/package.json dist",
     "copy-ui-to-dist": "mkdir -p dist/static && cp -R ui/build/ dist/static",
-    "pack-model": "cd model && yarn pack && tar -xvf temperature-model-*.tgz -C ../dist",
+    "pack-model": "cd model && yarn pack --filename ../dist/temperature-model.tgz",
     "build": "lerna exec yarn build",
     "start": "cd api && yarn start"
   },
