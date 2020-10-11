@@ -6,14 +6,51 @@ import {Location} from '@temperature/model';
 import {Status} from '@temperature/model';
 import {Temperature} from '@temperature/model';
 
+
+abstract class State {
+}
+
+class Stopped extends State{
+} 
+
+class StateWCycle extends State {
+  
+  readonly cycle: number;
+
+  constructor(cycle:number, ) {
+    super();
+    this.cycle = cycle;
+  }
+
+  stopCycle(): Stopped {
+    clearInterval(this.cycle);
+
+    return new Stopped();
+  }
+}
+
+class Idle extends StateWCycle {
+  
+}
+
+class Recording extends StateWCycle {
+  
+  readonly location: Location;
+
+  constructor(cycle:number, location:Location ){
+    super(cycle);
+    this.location = location;
+  }
+
+}
+ 
 export default class Controller {
 
   webConnector: Web;
   config: Config;
   dbConnector: DbConnector;
   oneWireConnector: OneWireConnector;
-  location?: Location;
-  cycle?: number;
+  state: State;
 
   static readonly defaultNbOfPoints = 6*60;
 
@@ -22,6 +59,7 @@ export default class Controller {
     this.webConnector = webConnector;
     this.dbConnector = dbConnector;
     this.oneWireConnector = oneWireConnector;
+    this.state = new Stopped();
   }
 
   startOn() {
@@ -34,7 +72,7 @@ export default class Controller {
       .then(()=> {
         console.log('db started on')
 
-        this.startSimpleCycle();
+        this.startIdleCycle();
 
         this.webConnector.setupBonjourAdvertisment();
       })
@@ -52,7 +90,7 @@ export default class Controller {
   }
 
   getStatus(): Status {
-    return  this.cycle ? new Status(true, this.location) : new Status(false, undefined);
+    return  this.state instanceof Recording ? new Status(true, this.state.location) : new Status(false);
   }
 
   getLastTemperatures(location: Location, nbOfPoints?: number): Promise<Temperature[]> {
@@ -62,33 +100,32 @@ export default class Controller {
     return this.dbConnector.getLatestTemperatures(location, effectiveNbOfPoints);
   }
 
-  stopAnyCycle() {
-    if (this.cycle) {
-      clearInterval(this.cycle);
-      this.cycle = undefined;
+  private stopCycle() {
+    if( this.state instanceof StateWCycle ){
+      this.state = this.state.stopCycle();
     }
-    this.location = undefined;
   }
 
   startRecordingCycle(location: Location) {
-    this.stopAnyCycle();
-    this.location = location;
-    this.cycle = setInterval(this.runRecordingCycle.bind(this), this.config.defaultIntervalMs);
+    this.stopCycle();
+    this.state = new Recording(
+      setInterval(this.runRecordingCycle.bind(this, location), this.config.defaultIntervalMs),
+      location
+    );
+    this.webConnector.emitStatus(this.getStatus());
   }
 
-  stopRecodingCycle(){ 
-    if( this.location ) {
-      this.startSimpleCycle()
-    }
+  stopRecordingCycle() {
+    this.startIdleCycle();
   }
 
-  startSimpleCycle() {
-    this.stopAnyCycle();
-    this.location = undefined;
-    this.cycle = setInterval(this.runSimpleCycle.bind(this), this.config.defaultIntervalMs);
+  private startIdleCycle() {
+    this.stopCycle();
+    this.state = new Idle( setInterval(this.runSimpleCycle.bind(this), this.config.defaultIntervalMs) );
+    this.webConnector.emitStatus(this.getStatus());
   }
 
-  runSimpleCycle() {
+  private runSimpleCycle() {
     this.oneWireConnector.readOneTemperature()
       .then(temperature => {
         this.webConnector.emitCurrentTemperature(new Temperature(temperature, new Date()));
@@ -99,23 +136,19 @@ export default class Controller {
 
   }
 
-  runRecordingCycle() {
+  private runRecordingCycle(location:Location) {
     this.oneWireConnector.readOneTemperature()
       .then(temperature => {
         if (!isNaN(temperature)) {
 
           this.webConnector.emitCurrentTemperature(new Temperature(temperature, new Date()));
-          
-          if( this.location ) {
-            return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), this.location)
-              .then( () => this.dbConnector.getLatestTemperatures(this.location!, Controller.defaultNbOfPoints ) )
-              .then( temperatures => {
-                this.webConnector.emitLastTemperatures(temperatures);
-                return Promise.resolve();
-              });
-          } else {
-            return Promise.resolve();
-          }
+           
+          return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), location)
+            .then( () => this.dbConnector.getLatestTemperatures(location, Controller.defaultNbOfPoints ) )
+            .then( temperatures => {
+              this.webConnector.emitLastTemperatures(temperatures);
+              return Promise.resolve();
+            });
         } else {
           console.log('bad checksum');
           return Promise.resolve();

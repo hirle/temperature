@@ -58,6 +58,15 @@ export default class Web {
       .catch(next);
     });
 
+    this.app.get('/api/status', (_, res, next) => {
+      try {
+        res.send(this.controller!.getStatus());
+      }
+      catch(err) {
+        next(err);
+      }
+    });
+
     this.app.get('/api/temperatures/:location', (req, res, next) => {
 
       const queryCount = req.query.count;
@@ -88,7 +97,7 @@ export default class Web {
     this.app.post('/api/recording/stop', (_, res, next) => {
       try {
 
-        this.controller!.stopRecodingCycle();
+        this.controller!.stopRecordingCycle();
 
         // HTTP_STATUS_NO_CONTENT
         res.sendStatus(204);

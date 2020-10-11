@@ -1,4 +1,4 @@
-import { Temperature } from '@temperature/model'
+import { Temperature, Location, Status } from '@temperature/model'
 
 function checkStatus(response: Response) {
     if (response.status >= 200 && response.status < 300) {
@@ -23,4 +23,27 @@ function checkStatus(response: Response) {
     const url = '/api/temperature/latest';
     return fetch(url, defaultOptions).then(checkStatus)
       .then(responseJson => Temperature.create(responseJson));
+  }
+  
+  export function GetCurrentStatus(): Promise<Status> {
+    const url = '/api/status';
+    return fetch(url, defaultOptions).then(checkStatus)
+      .then(responseJson => Status.create(responseJson));
+  }
+
+
+  export function StartRecording(location: Location): Promise<void> {
+    const options: RequestInit = {
+      method: 'POST'
+    };
+    const url = '/api/recording/start/' + location.serialize();
+    return fetch(url, options ).then(checkStatus);
+  }
+
+  export function StopRecording(): Promise<void> {
+    const options: RequestInit = {
+      method: 'POST'
+    };
+    const url = '/api/recording/stop';
+    return fetch(url, options ).then(checkStatus);
   }

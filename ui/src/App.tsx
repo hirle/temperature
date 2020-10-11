@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components'
 import CurrentTemperature from './CurrentTemperature'
+import RecordControl from './RecordControl'
 import SocketIo from './SocketIo';
 
 const StyledApp = styled.div`
@@ -25,6 +26,18 @@ const StyledHeader = styled.header`
 
 `;
 
+const TwoColumns = styled.section`
+  display:flex;
+	justify-content: center;
+`;
+
+const Frame = styled.article`
+  padding: 12px 12px;
+  margin: 2px;
+  border: solid thin gray;
+	flex: 1;
+`;
+
 export default class App extends React.Component {
 
   private socketIo: SocketIo;
@@ -43,11 +56,15 @@ export default class App extends React.Component {
       <StyledHeader className="App-header">
         Temperature
       </StyledHeader>
+      <TwoColumns>
+        <Frame>
+          <CurrentTemperature socketIo={this.socketIo}/>
+        </Frame>
+        <Frame>
+          <RecordControl socketIo={this.socketIo}/>
+        </Frame>
+      </TwoColumns>
       <section>
-        <CurrentTemperature socketIo={this.socketIo}/>
-      </section>
-      <section>
-                
       </section>
     </StyledApp>
   );

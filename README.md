@@ -92,6 +92,21 @@ Response:
 }
 ```
 
+
+#### Get current status
+
+Request:
+
+`GET /api/status`
+
+Response:
+```javascript
+{
+    "recording": true,
+    "location": "bedroom"
+}
+```
+
  #### Get recorded temperature
 
 Request:

@@ -9,9 +9,8 @@ const BigText = styled.span<{ bright: boolean }>`
   font-size: 48px;
 `;
 
-const Measure = styled.div`
+const Frame = styled.div`
   color: gray;
-  padding: 12px 48px;
 `;
 
 const Error = styled.div`
@@ -46,7 +45,11 @@ export default class CurrentTemperature
   componentDidMount() {
       GetCurrentTemperature()
         .then( temperature => {        
-          this.setState({status: Status.Running, current: temperature, connected:true});
+          this.setState({
+            status: Status.Running,
+            current: temperature,
+            connected:this.props.socketIo.isConnected()
+          });
 
           this.setUpSocketIO();
         })
@@ -77,7 +80,10 @@ export default class CurrentTemperature
   render() {
     switch(this.state.status)  {
       case Status.Loading: return <div>Loading...</div>;
-      case Status.Running: return <Measure><BigText bright={this.state.connected}>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}</Measure>;
+      case Status.Running: return (
+        <Frame>
+          <BigText bright={this.state.connected}>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}
+        </Frame>);
       default: return <Error>Can't get the temperature</Error>;
     }
   }
