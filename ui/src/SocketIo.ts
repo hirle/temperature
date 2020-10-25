@@ -16,6 +16,11 @@ export default class SocketIo {
         this.socket = io(path);
     }
 
+    public stop() {
+        // TODO code the stop
+        console.log('not implemented yet');
+    }
+
     public addObserver( event: string, notifyEvent: NotifyEvent ){
         if( ! this.observers.has(event)) {
             this.observers.set(event, []);
@@ -33,4 +38,5 @@ export default class SocketIo {
             this.observers.get(event)!.forEach( notifyEvent => notifyEvent(data));
         }
     }
+
 }

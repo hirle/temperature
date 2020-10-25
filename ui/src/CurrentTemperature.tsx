@@ -13,7 +13,7 @@ const Frame = styled.div`
   color: gray;
 `;
 
-const Error = styled.div`
+const StyledError = styled.div`
     font-size: 18px;
     color: red;
 `;
@@ -84,7 +84,7 @@ export default class CurrentTemperature
         <Frame>
           <BigText bright={this.state.connected}>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}
         </Frame>);
-      default: return <Error>Can't get the temperature</Error>;
+      default: return <StyledError>Can't get the temperature</StyledError>;
     }
   }
 }  

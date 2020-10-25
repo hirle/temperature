@@ -51,6 +51,11 @@ export default class App extends React.Component {
     this.socketIo.startOn('/');
   }
 
+
+  componentWillUnmount() {
+    this.socketIo.stop();
+  }
+
   render() { return (
     <StyledApp>
       <StyledHeader className="App-header">
