@@ -2,12 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import {Status as RecordingStatus, Location} from '@temperature/model';
 import {GetCurrentStatus, StartRecording, StopRecording} from './api';
-import TapeRecorder from './taperecorder/TapeRecorder'
+import TapeRecorder from './TapeRecorder'
 import SocketIo from './SocketIo';
 import { Button} from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
+const StyledTapeRecorder = styled(TapeRecorder)`
+    height: 56px;
+    margin: 0px 12px 0px 0px;
+    fill: white;
+`;
 
 const FixedWidthButton = styled(Button)`
     width: 144px;
@@ -124,7 +129,7 @@ export default class RecordControl
                 <Frame>
                     <Title>Recording</Title>
                     <TwoColumnsP>
-                        <TapeRecorder running={this.state.status!.recording}/>
+                        <StyledTapeRecorder running={this.state.status!.recording}/>
                         <FixedWidthButton ghost disabled={!this.state.connected} size="large" onClick={this.onClickBind}>{this.state.status!.recording ? 'Stop' : 'Start…'}</FixedWidthButton>
                         { this.state.status!.recording
                             ? <TwoStatesSpan bright={this.state.connected} >{'Location ' + (this.state.status!.location && this.state.status!.location.serialize())}</TwoStatesSpan>
