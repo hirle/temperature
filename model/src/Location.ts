@@ -9,6 +9,10 @@ export default class Location {
         return this.location;
     }
 
+    public toString(): string {
+        return this.location;
+    } 
+
     static create( data: any) {
         return new Location(data.location);
     }

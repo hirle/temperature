@@ -38,7 +38,7 @@ export default class DbConnector {
     }
 
     private prepareTable( tableName :string ): Promise<void> {
-        return this.client.query(`CREATE TABLE IF NOT EXISTS ${tableName} ( id SERIAL, location varchar(64) NOT NULL, value VARCHAR(255) NOT NULL, at TIMESTAMP NOT NULL);`)
+        return this.client.query(`CREATE TABLE IF NOT EXISTS ${tableName} ( id SERIAL, location varchar(64) NOT NULL, value VARCHAR(255) NOT NULL, at TIMESTAMPZ NOT NULL);`)
             .then(() => this.client.query(`CREATE INDEX iLocation ON ${tableName} (location)`))
             .then(() => this.client.query(`CREATE INDEX iAt ON ${tableName} (at)`))
             .then(() => Promise.resolve());
@@ -47,7 +47,7 @@ export default class DbConnector {
     public recordTemperature(temperature: Temperature, location: Location): Promise<void> {
        return this.client.query(
         `INSERT INTO ${DbConnector.tableName} (location, value, at) VALUES ($1, $2, $3)`,
-        [location.serialize(), temperature.value, temperature.timestamp.toISOString()]
+        [location.serialize(), temperature.value, temperature.timestamp]
         )
        .then( result => {
             if( result.rowCount !== 1) {

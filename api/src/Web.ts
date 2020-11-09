@@ -91,7 +91,7 @@ export default class Web {
         }
         catch(err) {
           next(err);
-        }
+        } 
     });
 
     this.app.post('/api/recording/stop', (_, res, next) => {

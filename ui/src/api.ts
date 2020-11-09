@@ -30,6 +30,18 @@ function checkStatus(response: Response) {
     return fetch(url, defaultOptions).then(checkStatus)
       .then(responseJson => Status.create(responseJson));
   }
+  
+  export function GetLastTemperatures(location: Location): Promise<Temperature[]> {
+    const url = `/api/temperatures/${location.serialize()}`;
+    return fetch(url.toString(), defaultOptions).then(checkStatus)
+      .then(responseJson => {
+        if( Array.isArray(responseJson) ) {
+          return responseJson.map( elt => Temperature.create(elt));
+        } else {
+          throw new Error('Expected an array, got ' + responseJson.toString())
+        }
+      });
+  }
 
 
   export function StartRecording(location: Location): Promise<void> {

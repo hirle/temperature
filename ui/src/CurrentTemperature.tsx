@@ -64,7 +64,8 @@ export default class CurrentTemperature
     this.props.socketIo.addObserver('current-temperature', this.onCurrentTemperature.bind(this));
     this.props.socketIo.addObserver('disconnect', this.onDisconnect.bind(this));
   }
-  onCurrentTemperature( data:any) {
+
+  onCurrentTemperature( data:any ) {
     const current = Temperature.create(data);
     this.setState({current});
   }

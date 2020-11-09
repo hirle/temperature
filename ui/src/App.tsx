@@ -1,7 +1,8 @@
 import React from 'react';
-import styled from 'styled-components'
-import CurrentTemperature from './CurrentTemperature'
-import RecordControl from './RecordControl'
+import styled from 'styled-components';
+import CurrentTemperature from './CurrentTemperature';
+import RecordControl from './RecordControl';
+import Graph from './Graph';
 import SocketIo from './SocketIo';
 
 const StyledApp = styled.div`
@@ -69,8 +70,9 @@ export default class App extends React.Component {
           <RecordControl socketIo={this.socketIo}/>
         </Frame>
       </TwoColumns>
-      <section>
-      </section>
+      <Frame>
+        <Graph socketIo={this.socketIo}/>
+      </Frame>
     </StyledApp>
   );
  }
