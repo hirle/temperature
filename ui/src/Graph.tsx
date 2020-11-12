@@ -147,10 +147,10 @@ export default class Graph
     const gridColor = '#404040';
     return this.state.data
     ? <Line data={this.state.data} options={{
-      legend: {display:false},
-      scales:{ xAxes: [{ ticks: { fontColor: axesColor }, gridLines: {color: gridColor }}],
-            yAxes: [{ ticks: { fontColor: axesColor }, gridLines: { color: gridColor }}]}
-    }}/>
+        legend: {display:false},
+        scales:{ xAxes: [{ ticks: { fontColor: axesColor }, gridLines: {color: gridColor }}],
+              yAxes: [{ ticks: { fontColor: axesColor }, gridLines: { color: gridColor }}]}
+      }}/>
     : <span>(No data yet...)</span>;
   }
 }    

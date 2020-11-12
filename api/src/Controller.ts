@@ -113,6 +113,7 @@ export default class Controller {
       location
     );
     this.webConnector.emitStatus(this.getStatus());
+    this.runRecordingCycle(location);
   }
 
   stopRecordingCycle() {
