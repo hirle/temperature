@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Status as RecordingStatus, Temperature} from '@temperature/model';
+import {SocketMessages} from '@temperature/model';
 import {GetCurrentStatus, GetLastTemperatures} from './api';
 import SocketIo from './SocketIo';
 import { Line } from 'react-chartjs-2';
@@ -72,10 +73,10 @@ export default class Graph
   }
 
   setUpSocketIO() {
-    this.props.socketIo.addObserver('connect', this.onConnect.bind(this));
-    this.props.socketIo.addObserver('status', this.onCurrentStatus.bind(this));
-    this.props.socketIo.addObserver('last-temperatures', this.onLastTemperatures.bind(this));
-    this.props.socketIo.addObserver('disconnect', this.onDisconnect.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.Connect, this.onConnect.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.Status, this.onCurrentStatus.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.LastTemperatures, this.onLastTemperatures.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.Disconnect, this.onDisconnect.bind(this));
   }
 
   onCurrentStatus( data:any) {

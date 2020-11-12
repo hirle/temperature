@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Temperature} from '@temperature/model';
+import {SocketMessages} from '@temperature/model';
 import {GetCurrentTemperature} from './api';
 import SocketIo from './SocketIo';
 
@@ -60,9 +61,9 @@ export default class CurrentTemperature
   }
 
   setUpSocketIO() {
-    this.props.socketIo.addObserver('connect', this.onConnect.bind(this));
-    this.props.socketIo.addObserver('current-temperature', this.onCurrentTemperature.bind(this));
-    this.props.socketIo.addObserver('disconnect', this.onDisconnect.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.Connect, this.onConnect.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.CurrentTemperature, this.onCurrentTemperature.bind(this));
+    this.props.socketIo.addObserver(SocketMessages.Disconnect, this.onDisconnect.bind(this));
   }
 
   onCurrentTemperature( data:any ) {

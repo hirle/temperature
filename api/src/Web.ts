@@ -8,6 +8,7 @@ import ciao from '@homebridge/ciao';
 import {Temperature} from '@temperature/model';
 import {Status} from '@temperature/model';
 import {Location} from '@temperature/model';
+import {SocketMessages} from '@temperature/model';
 
 export default class Web {
 
@@ -110,30 +111,30 @@ export default class Web {
   }
 
   emitCurrentTemperature(temperature: Temperature) {
-    this.io.emit('current-temperature', temperature);
+    this.io.emit(SocketMessages.CurrentTemperature, temperature);
   }
   
   emitStatus(status: Status) {
-    this.io.emit('status', status);
+    this.io.emit(SocketMessages.Status, status);
   }
   
   emitLastTemperatures(temperatures: Temperature[]) {
-    this.io.emit('last-temperatures', temperatures);
+    this.io.emit(SocketMessages.LastTemperatures, temperatures);
   }
 
   setupBonjourAdvertisment() { 
-    // create a service defining a web server running on port 3000
-    const service = ciao.getResponder().createService({
-        name: 'Temperature',
-        type: 'http',
-        port: this.config.port
-    });
+    if( this.config.bonjourName ) {
+      // create a service defining a web server running on port 3000
+      const service = ciao.getResponder().createService({
+          name: this.config.bonjourName,
+          type: 'http',
+          port: this.config.port
+      });
 
-    service.advertise().then(() => {
-      console.log("Service is published :)");
-    });
-    
-
+      service.advertise().then(() => {
+        console.log("Service is published :)");
+      });
+    }
   }
 
   setSocketIO() {

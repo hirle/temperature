@@ -14,6 +14,7 @@ export interface DbDescription {
 export default interface Config {
     defaultIntervalMs: number
     port: number,
+    bonjourName?: string,
     postgresql: DbDescription;
     oneWire: OneWireDescription;
 }

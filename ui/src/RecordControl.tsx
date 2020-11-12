@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Status as RecordingStatus, Location} from '@temperature/model';
+import {SocketMessages} from '@temperature/model';
 import {GetCurrentStatus, StartRecording, StopRecording} from './api';
 import TapeRecorder from './TapeRecorder'
 import SocketIo from './SocketIo';
@@ -103,9 +104,9 @@ export default class RecordControl
 
 
     setUpSocketIO() {
-        this.props.socketIo.addObserver('connect', this.onConnect.bind(this));
-        this.props.socketIo.addObserver('status', this.onCurrentStatus.bind(this));
-        this.props.socketIo.addObserver('disconnect', this.onDisconnect.bind(this));
+        this.props.socketIo.addObserver(SocketMessages.Connect, this.onConnect.bind(this));
+        this.props.socketIo.addObserver(SocketMessages.Status, this.onCurrentStatus.bind(this));
+        this.props.socketIo.addObserver(SocketMessages.Disconnect, this.onDisconnect.bind(this));
     }
 
     onCurrentStatus( data:any) {
