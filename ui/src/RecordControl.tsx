@@ -5,7 +5,8 @@ import {SocketMessages} from '@temperature/model';
 import {GetCurrentStatus, StartRecording, StopRecording} from './api';
 import TapeRecorder from './TapeRecorder'
 import SocketIo from './SocketIo';
-import { Button} from 'antd';
+import {   Button} from 'antd';
+import ChooseLocationModal from './ChooseLocationModal'
 import { LoadingOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 
@@ -28,6 +29,7 @@ const Frame = styled.div`
 `;
 
 const TwoStatesSpan = styled.span<{ bright: boolean }>`
+    margin-left: 18px;
     color: ${ props => props.bright ? 'white': 'gray'};
 `
 
@@ -55,7 +57,7 @@ interface ComponentState {
     connected: boolean
     componentStatus: ComponentStatus,
     status?: RecordingStatus,
-    modalVisible: boolean
+    modalVisible: boolean,
 }
 
 export default class RecordControl
@@ -92,16 +94,22 @@ export default class RecordControl
                     this.setState({componentStatus: ComponentStatus.Error});
                 });
         } else {
-            // TODO replace this random value
-            const randomLocation = new Location( Math.floor(Math.random()*16777216*16777216).toString(16));
-            StartRecording(randomLocation)
-                .catch( err => {
-                    console.log(err);
-                    this.setState({componentStatus: ComponentStatus.Error});
-                });
+            this.setState( { 
+                modalVisible: true
+            });
         }
     }
-
+    
+    handleNewLocation = ( newLocation: Location ) => {
+        this.setState({
+            modalVisible: false
+        });
+       StartRecording(newLocation)
+        .catch( err => {
+                console.log(err);
+                this.setState({componentStatus: ComponentStatus.Error});
+            });
+    }
 
     setUpSocketIO() {
         this.props.socketIo.addObserver(SocketMessages.Connect, this.onConnect.bind(this));
@@ -123,7 +131,6 @@ export default class RecordControl
     }
 
     render() {
-
         switch(this.state.componentStatus) {
             case ComponentStatus.Loading: return <div>Loading... <LoadingOutlined /></div>;
             case ComponentStatus.Ready: return (
@@ -132,6 +139,14 @@ export default class RecordControl
                     <TwoColumnsP>
                         <StyledTapeRecorder running={this.state.status!.recording}/>
                         <FixedWidthButton ghost disabled={!this.state.connected} size="large" onClick={this.onClickBind}>{this.state.status!.recording ? 'Stop' : 'Start…'}</FixedWidthButton>
+                        {   this.state.modalVisible
+                            &&
+                            (<ChooseLocationModal
+                                ok={ this.handleNewLocation }
+                                cancel={ ( )=> this.setState({modalVisible: false})}
+                                error={ () => this.setState({modalVisible: false, componentStatus:ComponentStatus.Error })}
+                            />)
+                        }
                         { this.state.status!.recording
                             ? <TwoStatesSpan bright={this.state.connected} >{'Location ' + (this.state.status!.location && this.state.status!.location.serialize())}</TwoStatesSpan>
                             : null

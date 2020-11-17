@@ -100,6 +100,14 @@ export default class Controller {
     return this.dbConnector.getLatestTemperatures(location, effectiveNbOfPoints);
   }
 
+  getLastLocations(nbOfPoints?: number): Promise<Location[]> {
+    const effectiveNbOfPoints = !nbOfPoints
+      ? Controller.defaultNbOfPoints
+      : nbOfPoints;
+    return this.dbConnector.getLatestLocations(effectiveNbOfPoints);
+  }
+
+
   private stopCycle() {
     if( this.state instanceof StateWCycle ){
       this.state = this.state.stopCycle();

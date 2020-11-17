@@ -43,6 +43,17 @@ function checkStatus(response: Response) {
       });
   }
 
+  export function GetLastLocations(): Promise<Location[]> {
+    const url = `/api/locations`;
+    return fetch(url.toString(), defaultOptions).then(checkStatus)
+      .then(responseJson => {
+        if( Array.isArray(responseJson) ) {
+          return responseJson.map( elt => Location.create(elt));
+        } else {
+          throw new Error('Expected an array, got ' + responseJson.toString())
+        }
+      });
+  }
 
   export function StartRecording(location: Location): Promise<void> {
     const options: RequestInit = {

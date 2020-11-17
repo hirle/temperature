@@ -23,15 +23,15 @@ interface CurrentTemperatureProps {
   socketIo: SocketIo
 }
 
-enum Status {
+enum ComponentStatus {
   Loading,
-  Running,
+  Ready,
   Error
 }
 
 interface CurrentTemperatureState {
     connected: boolean
-    status: Status,
+    status: ComponentStatus,
     current?: Temperature
 }
 
@@ -40,14 +40,14 @@ export default class CurrentTemperature
 
   constructor(props: CurrentTemperatureProps) {
       super(props);
-      this.state = {status: Status.Loading, connected: false};
+      this.state = {status: ComponentStatus.Loading, connected: false};
     }
 
   componentDidMount() {
       GetCurrentTemperature()
         .then( temperature => {        
           this.setState({
-            status: Status.Running,
+            status: ComponentStatus.Ready,
             current: temperature,
             connected:this.props.socketIo.isConnected()
           });
@@ -56,7 +56,7 @@ export default class CurrentTemperature
         })
         .catch( err => {
           console.log(err);
-          this.setState({status: Status.Error, current: undefined});
+          this.setState({status: ComponentStatus.Error, current: undefined});
         });
   }
 
@@ -81,8 +81,8 @@ export default class CurrentTemperature
 
   render() {
     switch(this.state.status)  {
-      case Status.Loading: return <div>Loading...</div>;
-      case Status.Running: return (
+      case ComponentStatus.Loading: return <div>Loading...</div>;
+      case ComponentStatus.Ready: return (
         <Frame>
           <BigText bright={this.state.connected}>{this.state.current!.value}°C</BigText> {this.state.current!.timestamp.toLocaleString()}
         </Frame>);

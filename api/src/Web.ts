@@ -80,6 +80,17 @@ export default class Web {
         .catch(next);
     });
 
+    this.app.get('/api/locations', (req, res, next) => {
+
+      const queryCount = req.query.count;
+
+      this.controller!.getLastLocations(queryCount ? parseInt(queryCount.toString()) : undefined )
+        .then(locations => {
+          res.status(200).send(locations);
+        })
+        .catch(next);
+    });
+
     this.app.post('/api/recording/start/:location',  (req, res, next) => {
 
       const location = new Location(req.params.location);

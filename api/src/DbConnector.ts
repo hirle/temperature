@@ -65,4 +65,12 @@ export default class DbConnector {
         )
         .then( result => result.rows.map( row => new Temperature(parseFloat(row.value), new Date(row.at))));
     }
+
+    public getLatestLocations(count: number): Promise<Location[]>{
+        return this.client.query(
+            `SELECT location, max(at) as maxAt FROM ${DbConnector.tableName} GROUP BY location ORDER BY max(at) DESC LIMIT $1`,
+            [count]
+        )
+        .then( result => result.rows.map( row => new Location(row.location)));
+    }
 }

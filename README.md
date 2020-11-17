@@ -146,6 +146,24 @@ Response:
 }
 ``` 
 
+#### Get locations
+
+Request:
+
+`GET /api/locations`
+
+Response:
+```javascript
+[
+    {
+        "location": "My room"
+    },
+    {
+        "location": "My cellar"
+    }
+]
+``` 
+
  #### Start recording at location
 
 Request:
