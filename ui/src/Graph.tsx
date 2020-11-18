@@ -5,7 +5,6 @@ import {SocketMessages} from '@temperature/model';
 import {GetCurrentStatus, GetLastTemperatures} from './api';
 import SocketIo from './SocketIo';
 import { Line } from 'react-chartjs-2';
-import moment from 'moment';
 
 const StyledError = styled.div`
   font-size: 18px;
@@ -119,13 +118,11 @@ export default class Graph
     if( temperatures ) {
       const graphColor = connected ? 'white' : 'grey';
       return {
-        labels: temperatures
-          .map( temperature => moment(temperature.timestamp).format('hh:mm')),
         datasets: [ {
           backgroundColor: graphColor,
           borderColor: graphColor,
           data: temperatures.map( temperature => ( {
-            x: temperature.timestamp.getTime(),
+            t: temperature.timestamp,
             y: temperature.value } ) ),
           fill: false,
           lineTension: 0,
@@ -149,7 +146,7 @@ export default class Graph
     return this.state.data
     ? <Line data={this.state.data} options={{
         legend: {display:false},
-        scales:{ xAxes: [{ ticks: { fontColor: axesColor }, gridLines: {color: gridColor }}],
+        scales:{ xAxes: [{ type: 'time', ticks: { fontColor: axesColor }, gridLines: {color: gridColor }}],
               yAxes: [{ ticks: { fontColor: axesColor }, gridLines: { color: gridColor }}]}
       }}/>
     : <span>(No data yet...)</span>;
