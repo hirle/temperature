@@ -58,6 +58,7 @@ export default class ChooseLocationModal
                 title="Choose location"
                 onOk={this.handleOk}
                 onCancel={this.props.cancel}
+                okText="Start recording"
             >
                 <AutoComplete
                     options={this.state.options}
