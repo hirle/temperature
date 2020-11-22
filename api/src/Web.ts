@@ -9,6 +9,7 @@ import {Temperature} from '@temperature/model';
 import {Status} from '@temperature/model';
 import {Location} from '@temperature/model';
 import {SocketMessages} from '@temperature/model';
+import {DateTime, Duration} from 'luxon';
 
 export default class Web {
 
@@ -74,6 +75,36 @@ export default class Web {
       const location = new Location(req.params.location);
 
       this.controller!.getLastTemperatures(location, queryCount ? parseInt(queryCount.toString()) : undefined )
+        .then(temperatures => {
+          res.status(200).send(temperatures);
+        })
+        .catch(next);
+    });
+
+    this.app.get('/api/temperatures/:location/since/:since', (req, res, next) => {
+
+      const since = DateTime.fromISO(req.params.since);
+      if( ! since.isValid ) {
+        throw new Error('invalid date:' + since?.invalid?.explanation )
+      }
+      const location = new Location(req.params.location);
+
+      this.controller!.getTemperaturesSince(location, since )
+        .then(temperatures => {
+          res.status(200).send(temperatures);
+        })
+        .catch(next);
+    });
+
+    this.app.get('/api/temperatures/:location/for/:for', (req, res, next) => {
+
+      const duration = Duration.fromISO(req.params.for);
+      if( ! duration.isValid ) {
+        throw new Error('invalid date:' + duration?.invalid?.explanation )
+      }
+      const location = new Location(req.params.location);
+
+      this.controller!.getTemperaturesFor(location, duration )
         .then(temperatures => {
           res.status(200).send(temperatures);
         })

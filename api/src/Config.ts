@@ -12,7 +12,7 @@ export interface DbDescription {
 }
 
 export default interface Config {
-    defaultIntervalMs: number
+    period: string
     port: number,
     bonjourName?: string,
     postgresql: DbDescription;

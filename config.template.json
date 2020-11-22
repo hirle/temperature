@@ -1,5 +1,5 @@
 {
-  "defaultIntervalMs" : 60000,
+  "period" : "PT1M",
   "port" : 3300,
   "postgresql": {
     "user": "postgres",

@@ -5,7 +5,7 @@ import DbConnector from './DbConnector';
 import {Location} from '@temperature/model';
 import {Status} from '@temperature/model';
 import {Temperature} from '@temperature/model';
-
+import {DateTime, Duration} from 'luxon';
 
 abstract class State {
 }
@@ -100,13 +100,22 @@ export default class Controller {
     return this.dbConnector.getLatestTemperatures(location, effectiveNbOfPoints);
   }
 
+  getTemperaturesSince(location: Location, since: DateTime): Promise<Temperature[]> {
+    return this.dbConnector.getTemperaturesSince(location, since);
+  }
+
+  getTemperaturesFor( location: Location, duration: Duration): Promise<Temperature[]> {
+    const now = DateTime.local();
+    return this.dbConnector.getTemperaturesSince(location, now.minus(duration));
+
+  }
+
   getLastLocations(nbOfPoints?: number): Promise<Location[]> {
     const effectiveNbOfPoints = !nbOfPoints
       ? Controller.defaultNbOfPoints
       : nbOfPoints;
     return this.dbConnector.getLatestLocations(effectiveNbOfPoints);
   }
-
 
   private stopCycle() {
     if( this.state instanceof StateWCycle ){
@@ -117,7 +126,7 @@ export default class Controller {
   startRecordingCycle(location: Location) {
     this.stopCycle();
     this.state = new Recording(
-      setInterval(this.runRecordingCycle.bind(this, location), this.config.defaultIntervalMs),
+      setInterval(this.runRecordingCycle.bind(this, location), Duration.fromISO(this.config.period).as("milliseconds")),
       location
     );
     this.webConnector.emitStatus(this.getStatus());
@@ -130,7 +139,7 @@ export default class Controller {
 
   private startIdleCycle() {
     this.stopCycle();
-    this.state = new Idle( setInterval(this.runSimpleCycle.bind(this), this.config.defaultIntervalMs) );
+    this.state = new Idle( setInterval(this.runSimpleCycle.bind(this), Duration.fromISO(this.config.period).as("milliseconds")) );
     this.webConnector.emitStatus(this.getStatus());
   }
 

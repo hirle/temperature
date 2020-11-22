@@ -1,6 +1,7 @@
 import {Temperature} from '@temperature/model';
 import {Location} from '@temperature/model';
 import { Client } from 'pg';
+import { DateTime } from 'luxon';
 
 import { DbDescription } from "./Config";
 
@@ -62,6 +63,15 @@ export default class DbConnector {
         return this.client.query(
             `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 ORDER BY at LIMIT $2) as descOrder ORDER BY at`, 
             [location.serialize(), count]
+        )
+        .then( result => result.rows.map( row => new Temperature(parseFloat(row.value), new Date(row.at))));
+    }
+
+
+    public getTemperaturesSince(location: Location, since: DateTime): Promise<Temperature[]>{
+        return this.client.query(
+            `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 AND at > $2 ORDER BY at) as descOrder ORDER BY at`, 
+            [location.serialize(), since.toJSDate() ]
         )
         .then( result => result.rows.map( row => new Temperature(parseFloat(row.value), new Date(row.at))));
     }

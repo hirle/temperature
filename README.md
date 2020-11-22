@@ -50,7 +50,7 @@ Go on (https://github.com/hirle/temperature), download the latest release and ex
 
 `sudo apt install postgresql -y`
 
-### Running
+### Run!
 
 `sudo systemctl start temperature`
 
@@ -59,7 +59,7 @@ Go on (https://github.com/hirle/temperature), download the latest release and ex
 A file named `config.json` must look like
 ```javascript
 {
-  "defaultIntervalMs" : 60000,
+  "period" : "PT1M",
   "port" : 3300,
   "postgresql" :{
     "user": "postgres",
@@ -73,6 +73,8 @@ A file named `config.json` must look like
   }
 }
 ```
+
+Period is written in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) format. Example: PT1M stands for 1 minute.
 
 #### Start the service
 
@@ -107,11 +109,66 @@ Response:
 }
 ```
 
- #### Get recorded temperature
+ #### Get recorded temperatures
+
+ ##### Last Nth temperatures
 
 Request:
 
-`GET /api/temperatures?count=3`
+`GET /api/temperatures/bedroom?count=3`
+
+Response:
+```javascript
+[
+    {
+        "timestamp": "2020-04-09T21:33:22Z",
+        "value": "12.125"
+    },
+    {
+        "timestamp": "2020-04-09T21:32:21Z",
+        "value": "12.25"
+    },
+    {
+        "timestamp": "2020-04-09T21:31:21Z",
+        "value": "12.25"
+    }
+]
+``` 
+
+
+ ##### Get temperatures since a date
+
+Request:
+
+`GET /api/temperatures/bedroom/since/1984-01-20T08:00:00Z`
+
+Date in [ISO8601](https://fr.wikipedia.org/wiki/ISO_8601) format
+
+Response:
+```javascript
+[
+    {
+        "timestamp": "2020-04-09T21:33:22Z",
+        "value": "12.125"
+    },
+    {
+        "timestamp": "2020-04-09T21:32:21Z",
+        "value": "12.25"
+    },
+    {
+        "timestamp": "2020-04-09T21:31:21Z",
+        "value": "12.25"
+    }
+]
+``` 
+
+##### Get temperatures for a period
+
+Request:
+
+`GET /api/temperatures/bedroom/for/P3D`
+
+Duration in [ISO8601](https://fr.wikipedia.org/wiki/ISO_8601) format.  Here `P3D` is 3 days.
 
 Response:
 ```javascript
