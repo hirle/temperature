@@ -85,7 +85,7 @@ export default class Web {
 
       const since = DateTime.fromISO(req.params.since);
       if( ! since.isValid ) {
-        throw new Error('invalid date:' + since?.invalid?.explanation )
+        throw new Error('invalid date:' + since.invalidExplanation )
       }
       const location = new Location(req.params.location);
 
@@ -100,7 +100,7 @@ export default class Web {
 
       const duration = Duration.fromISO(req.params.for);
       if( ! duration.isValid ) {
-        throw new Error('invalid date:' + duration?.invalid?.explanation )
+        throw new Error('invalid duration:' + duration.invalidExplanation )
       }
       const location = new Location(req.params.location);
 
