@@ -53,6 +53,7 @@ export default class Controller {
   state: State;
 
   static readonly defaultNbOfPoints = 6*60;
+  static readonly socketIODataPeriod = Duration.fromISO("P3D");
 
   constructor(config: Config, webConnector: Web, dbConnector: DbConnector, oneWireConnector: OneWireConnector) {
     this.config = config;
@@ -162,7 +163,7 @@ export default class Controller {
           this.webConnector.emitCurrentTemperature(new Temperature(temperature, new Date()));
            
           return this.dbConnector.recordTemperature(new Temperature(temperature, new Date()), location)
-            .then( () => this.dbConnector.getLatestTemperatures(location, Controller.defaultNbOfPoints ) )
+            .then( () => this.getTemperaturesFor(location, Controller.socketIODataPeriod ) )
             .then( temperatures => {
               this.webConnector.emitLastTemperatures(temperatures);
               return Promise.resolve();
