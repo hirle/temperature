@@ -68,7 +68,7 @@ To find the path of the 1Wire probe, explore what is under `/sys/bus/w1/devices`
 
 ### Run!
 
-`node index.js config.json
+`node index.js config.json`
 
 ### API
 
