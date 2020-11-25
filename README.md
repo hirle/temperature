@@ -20,7 +20,7 @@ The temperature is measured with 1wire probe. A simple model like DS18B20+ by Ma
 
 Temperature is made with NodeJS. It runs as a service. It uses a postgres database to persist the data.
 
-### Prepare the pi
+### Prerequisites
 
 #### Install NodeJS
 
@@ -29,35 +29,22 @@ At the time of writing, NodeJS LTS is 12.18.1. You may want to adapt the version
 `curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -`
 `sudo apt-get install -y nodejs`
 
-#### Create a nologin user
+#### You need a postgres db
 
-```
-sudo adduser temperature
-chsh /usr/sbin/nologin temperature
-```
+Maybe `sudo apt install postgresql -y`
 
 ### Download temperature
 
-Go on (https://github.com/hirle/temperature), download the latest release and expand the tar gz.
+Go on (https://github.com/hirle/temperature/releases/latest), download the latest release and expand the tar gz.
 
-### Prepare the service
+### Prepare the execution
 
 `npm install file:./temperature-model.tgz`
 `npm install`
 
-`sudo systemctl enable temperature`
+### Prepare a config file
 
-### Prepare the database
-
-`sudo apt install postgresql -y`
-
-### Run!
-
-`sudo systemctl start temperature`
-
-#### Prepare a config file
-
-A file named `config.json` must look like
+Copy the file `confit.template.json` as `config.json` and make it yours. This looks like:
 ```javascript
 {
   "period" : "PT1M",
@@ -70,14 +57,18 @@ A file named `config.json` must look like
     "database": "postgres"
   },
   "one-wire" :{
-    "path" : "/Users/hirle/Developer/workspace/temperature/example.frame"
+    "path" : "/sys/bus/w1/devices/28-0414606b95ff/w1_slave"
   }
 }
 ```
 
-Period is written in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) format. Example: PT1M stands for 1 minute.
+Period is written in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) format. Here PT1M stands for 1 minute.
 
-#### Start the service
+To find the path of the 1Wire probe, explore what is under `/sys/bus/w1/devices`, there isn't many devices there.
+
+### Run!
+
+`node index.js config.json
 
 ### API
 
