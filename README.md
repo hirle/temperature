@@ -7,7 +7,8 @@ This fine-tuning means bringing permanent confort. But not only, it saves from e
 
 Temperature want to help on that.
 
-Put the raspberry in your room and start recording. It will collect the data, and later study your data.
+Put the raspberry in your room and start recording. It will collect the data, and show a nice graph.
+![Screenshot](demo/screenshot.gif)
 
 ## Hardware
 
