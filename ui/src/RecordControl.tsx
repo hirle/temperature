@@ -148,7 +148,7 @@ export default class RecordControl
                             />)
                         }
                         { this.state.status!.recording
-                            ? <TwoStatesSpan bright={this.state.connected} >{'Location ' + (this.state.status!.location && this.state.status!.location.serialize())}</TwoStatesSpan>
+                            ? <TwoStatesSpan bright={this.state.connected} >{'Location: ' + (this.state.status!.location && this.state.status!.location.serialize())}</TwoStatesSpan>
                             : null
                         }
                     </TwoColumnsP>

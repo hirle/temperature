@@ -128,12 +128,12 @@ export default class Graph
           lineTension: 0,
           pointBorderColor: graphColor,
           pointBackgroundColor: 'black',
-          pointHoverRadius: 5,
+          pointHoverRadius: 2,
           pointHoverBackgroundColor: 'black',
           pointHoverBorderColor: graphColor,
-          pointHoverBorderWidth: 4,
+          pointHoverBorderWidth: 2,
           pointRadius: 2,
-          pointHitRadius: 10
+          pointHitRadius: 6
         } ] };
       } else {
       return null;
