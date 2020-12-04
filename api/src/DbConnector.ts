@@ -39,7 +39,7 @@ export default class DbConnector {
     }
 
     private prepareTable( tableName :string ): Promise<void> {
-        return this.client.query(`CREATE TABLE IF NOT EXISTS ${tableName} ( id SERIAL, location varchar(64) NOT NULL, value VARCHAR(255) NOT NULL, at TIMESTAMPZ NOT NULL);`)
+        return this.client.query(`CREATE TABLE IF NOT EXISTS ${tableName} ( id SERIAL, location varchar(64) NOT NULL, value DOUBLE PRECISION NOT NULL, at TIMESTAMP WITH TIME ZONE NOT NULL);`)
             .then(() => this.client.query(`CREATE INDEX iLocation ON ${tableName} (location)`))
             .then(() => this.client.query(`CREATE INDEX iAt ON ${tableName} (at)`))
             .then(() => Promise.resolve());
@@ -64,7 +64,7 @@ export default class DbConnector {
             `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 ORDER BY at LIMIT $2) as descOrder ORDER BY at`, 
             [location.serialize(), count]
         )
-        .then( result => result.rows.map( row => new Temperature(parseFloat(row.value), new Date(row.at))));
+        .then( result => result.rows.map( row => new Temperature(row.value, new Date(row.at))));
     }
 
 
@@ -73,7 +73,7 @@ export default class DbConnector {
             `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 AND at > $2 ORDER BY at) as descOrder ORDER BY at`, 
             [location.serialize(), since.toJSDate() ]
         )
-        .then( result => result.rows.map( row => new Temperature(parseFloat(row.value), new Date(row.at))));
+        .then( result => result.rows.map( row => new Temperature(row.value, new Date(row.at))));
     }
 
     public getLatestLocations(count: number): Promise<Location[]>{
