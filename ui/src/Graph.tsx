@@ -121,6 +121,7 @@ export default class Graph
         datasets: [ {
           backgroundColor: graphColor,
           borderColor: graphColor,
+          borderWidth: 1,
           data: temperatures.map( temperature => ( {
             t: temperature.timestamp,
             y: temperature.value } ) ),
@@ -132,8 +133,8 @@ export default class Graph
           pointHoverBackgroundColor: 'black',
           pointHoverBorderColor: graphColor,
           pointHoverBorderWidth: 2,
-          pointRadius: 2,
-          pointHitRadius: 6
+          pointRadius: 1,
+          pointHitRadius: 2
         } ] };
       } else {
       return null;

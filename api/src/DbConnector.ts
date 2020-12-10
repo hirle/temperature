@@ -61,7 +61,7 @@ export default class DbConnector {
 
     public getLatestTemperatures(location: Location, count: number): Promise<Temperature[]>{
         return this.client.query(
-            `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 ORDER BY at LIMIT $2) as descOrder ORDER BY at`, 
+            `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 ORDER BY at DESC LIMIT $2) as descOrder ORDER BY at`, 
             [location.serialize(), count]
         )
         .then( result => result.rows.map( row => new Temperature(row.value, new Date(row.at))));
@@ -70,7 +70,7 @@ export default class DbConnector {
 
     public getTemperaturesSince(location: Location, since: DateTime): Promise<Temperature[]>{
         return this.client.query(
-            `SELECT value, at FROM ( SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 AND at > $2 ORDER BY at) as descOrder ORDER BY at`, 
+            `SELECT value, at FROM ${DbConnector.tableName} WHERE location = $1 AND at > $2 ORDER BY at`, 
             [location.serialize(), since.toJSDate() ]
         )
         .then( result => result.rows.map( row => new Temperature(row.value, new Date(row.at))));
