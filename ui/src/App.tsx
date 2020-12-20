@@ -6,9 +6,8 @@ import Graph from './Graph';
 import SocketIo from './SocketIo';
 
 const StyledApp = styled.div`
-  background-color: #282c34;
   color: white;
-  height: 100vh;
+  height: 100%;
 
   margin: 0;
   padding: 0;
