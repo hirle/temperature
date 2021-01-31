@@ -2,7 +2,7 @@
 
 # Temperature
 
-When having the chance to live in a large house, like me, setting up correctly the central heating can be not that trivial: you need understand how your house reacts when outside tempature goes up or down.
+When having the chance to live in a large house, like me, setting up correctly the central heating can be not that trivial: you need understand how your house reacts when outside temperature goes up or down.
 This fine-tuning means bringing permanent confort. But not only, it saves from emitting too much green gas.
 
 Temperature want to help on that.
@@ -44,7 +44,7 @@ Go on (https://github.com/hirle/temperature/releases/latest), download the lates
 
 ### Prepare a config file
 
-Copy the file `confit.template.json` as `config.json` and make it yours. This looks like:
+Copy the file `config.template.json` as `config.json` and make it yours. This looks like:
 ```javascript
 {
   "period" : "PT1M",
