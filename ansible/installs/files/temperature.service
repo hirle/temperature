@@ -1,0 +1,10 @@
+[Unit]
+Description=Temperature
+
+[Service]
+User=temperature
+Group=temperature
+ExecStart=/usr/local/bin/demo
+
+[Install]
+WantedBy=multi-user.target

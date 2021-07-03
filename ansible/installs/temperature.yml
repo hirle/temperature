@@ -1,0 +1,39 @@
+---
+- name: Install temperature
+  hosts: temperature
+  become: yes
+  roles:
+    - httpd_w_ws
+    - node14
+    - postgres
+
+  tasks:
+    - name: create temperature group
+      group:
+        name: demo
+        state: present
+
+    - name: create temperature user
+      user:
+        name: temperature
+        groups: temperature
+        shell: /sbin/nologin
+        append: yes
+        state: present
+        create_home: no
+
+    - name: Copy systemd service file to server
+      copy:
+        src: temperature.service
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+      notify:
+        - Start temperature
+
+  handlers:
+    - name: Start temperature
+      systemd:
+        name: temperature
+        state: started
+        enabled: yes

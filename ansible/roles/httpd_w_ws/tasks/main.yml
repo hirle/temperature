@@ -1,0 +1,6 @@
+---
+- name: install apache2
+  apt: name=apache2 update_cache=yes state=latest
+  
+- name: Ensure that httpd is started
+  service: name=httpd state=started enabled=true
