@@ -3,14 +3,14 @@
   hosts: temperature
   become: yes
   roles:
-    - httpd_w_ws
+    - httpd_w_socketio
     - node14
     - postgres
 
   tasks:
     - name: create temperature group
       group:
-        name: demo
+        name: temperature
         state: present
 
     - name: create temperature user
@@ -30,6 +30,19 @@
         group: root
       notify:
         - Start temperature
+    
+    - name: Copy temperature.conf to apache2
+      copy:
+        src: temperature.conf
+        dest: /etc/apache2/sites-available
+        owner: root
+        group: root
+      notify:
+        - Restart apache2
+
+    - name: Enable new site
+      shell: /usr/sbin/a2ensite temperature.conf
+      notify: Restart apache2
 
   handlers:
     - name: Start temperature
@@ -37,3 +50,6 @@
         name: temperature
         state: started
         enabled: yes
+    - name: Restart apache2
+      service: name=apache2 state=restarted
+

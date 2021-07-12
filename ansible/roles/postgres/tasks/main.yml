@@ -1,8 +1,6 @@
 ---
 - name: Install PostgreSQL
-  apt: name={{ item }} update_cache=true state=installed
-  with_items:
-    - postgresql
+  apt: name=postgresql update_cache=true state=latest
 
 - name: Ensure the PostgreSQL service is running
   service: name=postgresql state=started enabled=yes
