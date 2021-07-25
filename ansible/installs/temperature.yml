@@ -44,6 +44,48 @@
       shell: /usr/sbin/a2ensite temperature.conf
       notify: Restart apache2
 
+    - name: create directory for temperature
+      ansible.builtin.file:
+        path: /opt/temperature
+        owner: temperature
+        group: temperature
+        state: directory
+        mode: '0755'
+
+    - name: query latest release from GitHub
+      ansible.builtin.uri:                                                               
+        url: https://api.github.com/repos/hirle/temperature/releases/latest
+        return_content: true                                             
+      register: json_reponse          
+
+    - name: download release from GitHub    
+      get_url:                                                           
+        url: "{{ json_reponse.json.assets[0].browser_download_url }}"                       
+        dest: /tmp/temperature-latest.tar.gz       
+
+    - name: unpack release
+      unarchive:                       
+        remote_src: yes                                    
+        src: /tmp/temperature-latest.tar.gz
+        dest: /tmp
+    
+    - name: copy release to destination
+      copy:
+        remote_src: yes
+        src: /tmp/package/
+        dest: /opt/temperature
+        owner: temperature
+        group: temperature
+
+    - name: install model
+      npm:
+        path: /opt/temperature
+        name: ./temperature-model.tgz
+
+    - name: install node dependencies
+      npm:
+        path: /opt/temperature
+
   handlers:
     - name: Start temperature
       systemd:
