@@ -1,10 +1,14 @@
 [Unit]
-Description=Temperature
+Description=temperature
+After=network.target
 
 [Service]
+ExecStart=/bin/bash /opt/temperature/scripts/start.sh
+WorkingDirectory=/opt/temperature
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
 User=temperature
-Group=temperature
-ExecStart=/usr/local/bin/demo
 
 [Install]
 WantedBy=multi-user.target
