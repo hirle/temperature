@@ -1,0 +1,165 @@
+---
+- name: Install temperature
+  hosts: temperature
+  become: yes
+  roles:
+    - httpd_w_socketio
+    - node14
+    - postgres
+
+  tasks:
+    - name: create temperature group
+      group:
+        name: temperature
+        state: present
+
+    - name: create temperature user
+      user:
+        name: temperature
+        groups: temperature
+        shell: /sbin/nologin
+        append: yes
+        state: present
+        create_home: no
+
+    - name: Copy systemd service file to server
+      copy:
+        src: temperature.service
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+      notify:
+        - Restart temperature
+    
+    - name: Copy temperature.conf to apache2
+      copy:
+        src: temperature.conf
+        dest: /etc/apache2/sites-available
+        owner: root
+        group: root
+      notify:
+        - Restart apache2
+
+    - name: Enable new site
+      shell: /usr/sbin/a2ensite temperature.conf
+      notify: Restart apache2
+
+    - name: create directory for temperature
+      ansible.builtin.file:
+        path: /opt/temperature
+        owner: temperature
+        group: temperature
+        state: directory
+        mode: '0755'
+
+    - name: query latest release from GitHub
+      ansible.builtin.uri:                                                               
+        url: https://api.github.com/repos/hirle/temperature/releases/latest
+        return_content: true                                             
+      register: json_reponse          
+
+    - name: download release from GitHub    
+      get_url:                                                           
+        url: "{{ json_reponse.json.assets[0].browser_download_url }}"                       
+        dest: /tmp/temperature-latest.tar.gz       
+
+    - name: unpack release
+      unarchive:                       
+        remote_src: yes                                    
+        src: /tmp/temperature-latest.tar.gz
+        dest: /opt/temperature
+        owner: temperature
+        group: temperature
+
+    - name: prepare bin directory
+      command: rm -rd /opt/temperature/bin
+
+    - name: name bin directory
+      command: mv /opt/temperature/package /opt/temperature/bin
+
+    - name: install model
+      npm:
+        path: /opt/temperature/bin
+        name: ./temperature-model.tgz
+
+    - name: install node dependencies
+      npm:
+        path: /opt/temperature/bin
+
+    - name: create directory config for temperature
+      ansible.builtin.file:
+        path: /opt/temperature/config
+        owner: temperature
+        group: temperature
+        state: directory
+        mode: '0755'
+    
+    - name: create directory scripts for temperature
+      ansible.builtin.file:
+        path: /opt/temperature/scripts
+        owner: temperature
+        group: temperature
+        state: directory
+        mode: '0755'
+
+    - name: copy start.sh file to scripts
+      copy:
+        src: start.sh
+        dest: /opt/temperature/scripts
+
+    - name: declare service temperature
+      copy:
+        src: temperature.service
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+      notify:
+        - Restart temperature
+
+    - name: Enable service temperature
+      ansible.builtin.service:
+        name: temperature
+        enabled: yes
+      notify:
+        - Restart temperature
+
+    - name: Create the database specified in vars
+      become: true
+      become_user: postgres
+      postgresql_db: name=temperature
+            state=present
+    - name: Ensure user has access to the new database
+      become: true
+      become_user: postgres
+      postgresql_user: db=temperature
+            name=temperature
+            password=temperature
+            priv=ALL
+            state=present
+    - name: Ensure user does not have unnecessary permissions
+      become: true
+      become_user: postgres
+      postgresql_user: name=temperature
+            role_attr_flags=NOSUPERUSER,NOCREATEDB
+            state=present
+
+    - name: Copy config file  
+      copy:
+        src: config.json
+        dest: /opt/temperature/config
+        owner: temperature
+        group: temperature
+        mode: '0644'
+      notify:
+        - Restart temperature
+
+  handlers:
+    - name: Restart temperature
+      service:
+        name: temperature
+        state: restarted
+    - name: Restart apache2
+      service:
+        name: apache2
+        state: restarted
+

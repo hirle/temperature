@@ -18,33 +18,15 @@ The temperature is measured with 1wire probe. A simple model like DS18B20+ by Ma
 
 ## Software
 
-Temperature is made with NodeJS. It runs as a service. It uses a postgres database to persist the data.
+Temperature is made with NodeJS. It runs as a service. It uses a postgres database to persist the data. 
 
-### Prerequisites
+### Deploy
 
-#### Install NodeJS
+An ansible playbook is provided. It deploys roles `httpd`, `postgres` and tasks related to `temperature`.
 
-At the time of writing, NodeJS LTS is 12.18.1. You may want to adapt the version number.
+#### Prepare a config file
 
-`curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -`
-`sudo apt-get install -y nodejs`
-
-#### You need a postgres db
-
-Maybe `sudo apt install postgresql -y`
-
-### Download temperature
-
-Go on (https://github.com/hirle/temperature/releases/latest), download the latest release and expand the tar gz.
-
-### Prepare the execution
-
-`npm install file:./temperature-model.tgz`
-`npm install`
-
-### Prepare a config file
-
-Copy the file `config.template.json` as `config.json` and make it yours. This looks like:
+Copy the file `config.template.json` to `ansible/installs/files/config.json` and make it yours. This looks like:
 ```javascript
 {
   "period" : "PT1M",
@@ -66,9 +48,13 @@ Period is written in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)
 
 To find the path of the 1Wire probe, explore what is under `/sys/bus/w1/devices`, there isn't many devices there.
 
-### Run!
+#### Adapt the `hosts` file
 
-`node index.js config.json`
+Adapt the file `ansible/inventory/hosts` to where you want to deploy.
+
+#### Deploy!
+
+Move to directory `ansible` and run `ansible-playbook installs/temperature.yml`
 
 ### API
 
