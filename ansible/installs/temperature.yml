@@ -29,7 +29,7 @@
         owner: root
         group: root
       notify:
-        - Start temperature
+        - Restart temperature
     
     - name: Copy temperature.conf to apache2
       copy:
@@ -114,14 +114,14 @@
         owner: root
         group: root
       notify:
-        - Start temperature
+        - Restart temperature
 
     - name: Enable service temperature
       ansible.builtin.service:
         name: temperature
         enabled: yes
       notify:
-        - Start temperature
+        - Restart temperature
 
     - name: Create the database specified in vars
       become: true
@@ -151,14 +151,15 @@
         group: temperature
         mode: '0644'
       notify:
-        - Start temperature
+        - Restart temperature
 
   handlers:
-    - name: Start temperature
-      systemd:
+    - name: Restart temperature
+      service:
         name: temperature
-        state: started
-        enabled: yes
+        state: restarted
     - name: Restart apache2
-      service: name=apache2 state=restarted
+      service:
+        name: apache2
+        state: restarted
 
