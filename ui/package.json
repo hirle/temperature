@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
-    "@temperature/model": "^1.1.0",
+    "@temperature/model": "^1.1.1",
     "antd": "^4.7.0",
     "chart.js": "^2.9.4",
     "luxon": "^1.25.0",
