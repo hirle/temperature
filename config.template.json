@@ -2,11 +2,11 @@
   "period" : "PT1M",
   "port" : 3300,
   "postgresql": {
-    "user": "postgres",
-    "password": "postgres",
+    "user": "temperature",
+    "password": "temperature",
     "host": "localhost",
     "port": 5432,
-    "database": "postgres"
+    "database": "temperature"
   },
   "oneWire" :{
     "path" : "/sys/bus/w1/devices/28-0414606b95ff/w1_slave"

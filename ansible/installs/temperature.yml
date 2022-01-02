@@ -72,7 +72,9 @@
         group: temperature
 
     - name: prepare bin directory
-      command: rm -rd /opt/temperature/bin
+      command: 
+        cmd: rm -rd /opt/temperature/bin
+        removes: /opt/temperature/bin
 
     - name: name bin directory
       command: mv /opt/temperature/package /opt/temperature/bin
@@ -136,7 +138,7 @@
             password=temperature
             priv=ALL
             state=present
-    - name: Ensure user does not have unnecessary permissions
+    - name: Ensure user, without too much permissions
       become: true
       become_user: postgres
       postgresql_user: name=temperature
