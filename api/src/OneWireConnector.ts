@@ -15,7 +15,7 @@ export default class OneWireConnector {
           reject(err);
         } else {
           const [lineOne, lineTwo] = data.split('\n');
-          const elts = lineTwo.match(/\st=(\d+)$/);
+          const elts = lineTwo.match(/\st=(-?\d+)$/);
           if (lineOne.endsWith('YES') && elts) {
             resolve(Number.parseInt(elts[1]) / 1000);
           } else {

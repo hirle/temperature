@@ -20,6 +20,10 @@ The temperature is measured with 1wire probe. A simple model like DS18B20+ by Ma
 
 Temperature is made with NodeJS. It runs as a service. It uses a postgres database to persist the data. 
 
+### Test
+
+Run `yarn test`
+
 ### Deploy
 
 An ansible playbook is provided. It deploys roles `httpd`, `postgres` and tasks related to `temperature`.
