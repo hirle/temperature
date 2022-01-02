@@ -15,9 +15,9 @@ class Stopped extends State{
 
 class StateWCycle extends State {
   
-  readonly cycle: number;
+  readonly cycle: NodeJS.Timer;
 
-  constructor(cycle:number, ) {
+  constructor(cycle:NodeJS.Timer, ) {
     super();
     this.cycle = cycle;
   }
@@ -37,7 +37,7 @@ class Recording extends StateWCycle {
   
   readonly location: Location;
 
-  constructor(cycle:number, location:Location ){
+  constructor(cycle:NodeJS.Timer, location:Location ){
     super(cycle);
     this.location = location;
   }
