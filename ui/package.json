@@ -18,7 +18,7 @@
     "@temperature/model": "^1.1.1",
     "antd": "^4.7.0",
     "chart.js": "^2.9.4",
-    "luxon": "^1.25.0",
+    "luxon": "^2.5.2",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.11.1",
     "react-dom": "^16.13.1",
